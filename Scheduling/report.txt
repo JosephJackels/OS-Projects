@@ -1,0 +1,33 @@
+***
+
+Scheduler test program usage:
+
+$ multifork n tickets[1] tickets[2] ... tickets[n]
+where n is the amount of test processes to make.
+
+multifork.c will create n children, set their ticket values, and the children will execute
+testproc.c which simply yields the cpu 500 times
+
+***
+
+Sample output from testing scheduler:
+
+$multifork 2 1 10
+The given count of procedures is: 2, 2 children will be created to exec testproc with given amount of tickets
+The parent pid is: 8
+
+2 children will now be created
+Child number: 1 created. PID: 9
+Child number: 2 created. PID: 10
+10 started at ticks 2100, ended at ticks 2681, used 504 of those ticks, and had a ticket priority of 10
+9 started at ticks 2096, ended at ticks 3109, used 503 of those ticks, and had a ticket priority of 1
+8 started at ticks 2089, ended at ticks 3111, used 14 of those ticks, and had a ticket priority of 1
+
+*** ANALYSIS ***
+
+As expected while process 10 was running it used 86% of the time slots - it has a priority of 10 out of the 12 total tickets = 83%
+
+The actual value being 86% was likely because process 8 would only use a few more slots before it is waiting for children to finish and thus be unrunnable and not being scheduled
+
+Process 9 then used the remaing tickets for itself, because process 8 is the parent waiting for both children to finish.
+

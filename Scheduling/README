@@ -1,0 +1,173 @@
+***How the project works***
+
+	*Project Description*
+
+		The goal of this project is to change the scheduler included with xv6 from a Round Robin Scheduler to a Lottery Scheduler
+
+		The project description outlines that processes should have a default ticket value (priority) of 1, and a system call can be made to change the ticket value.
+		The ticket value should be no less than 1.
+
+		There should be two queues: a high priority queue and a low priority queue.
+
+		Newly created processes should begin in the high queue, run once, then be moved to the low priority queue.
+
+		Items in the low priority queue should run twice before yielding the cpu.
+
+	*Implementation Description*
+
+		I completed this project by creating a struct for tracking process information for all currently running processes, most importantly being the id, and the accumulated ticks each processes has accumulated in each queue.
+
+		I created a "ticktracker" struct for tracking when each process began and ended to help with calculating whether my scheduler was choosing processes properly.
+		This tracker keeps a count of how many times the scheduler function has run any process, and uses that count as a sort of timestap for when processes began and end.
+
+		In order to have processes in the low priority queue always run twice, I created a third queue - the 'High' low priority queue. I created this queue for the offchance that an item in the low priority queue runs once, and for some reason is not able to run again a second time right away (e.x. the proccess is sleeping). This way everytime the scheduler begins again it can check if there are items that are low priority that need to be run for their second slice before choosing out of the other queues.
+
+		The functional priority for my scheduler is:
+			1. the "high" low priority queue (low priority proccesses that need to run for their second time slice)
+			2. the high priority queue (new processes)
+			3. the low priority queue (processes that have ran once in the high queue, or have completed their second time slice in the high low queue)
+
+		The schedule searches each queue in order of priority for a runnable process. It does this by calling the findwinner() function for each queue.
+
+		The find winner function makes a temporary copy of each queue. It calculates the total tickets in the queue, generates a winning number between 0 and theis number, and steps through the queue adding the tickets of each processes until it reaches the winning number - thus finding the winning process. If the winner is not in a runnable state, it is removed from the temporary queue, the total tickets and random winning number are recalculated, and the process repeats. The function checks if the queue is empty when it is first called, and after each removal of an unrunnable process, and if so signals to the scheduler that the queue does not have any runnable processes.
+
+		When a winner is found, the process info struct is updated with how many ticks have been used in the appropriate queue, the process is moved from its current queue to the next applicable queue (high -> low, low -> high/low, high/low -> low)
+
+		The process to be run is then passed to the cpu and run as normal.
+
+		The end value in the ticktracker struct is set for each process when it calls the exit function.
+		The wait function cleans up finsished processes (ZOMBIE state), and removes them from the ticktracker and pinfo structs, and removes them from whichever queue they are in, opening the slots up for future processes.
+
+		The fork function sets a processes tickets value to the parent's ticket value after allocating the child process
+
+***Project Testing***
+
+	Simply use the provided multifork user program to create multiple processes and assign them ticket values.
+	The program can be run like so:
+
+		$multifork n tickets[1] tickets[2] ... tickets[n]
+
+		example output
+
+		$ multifork 2 5 10
+
+		At tick count: 32
+		PID: 1, TICKS: 15
+		PID: 2, TICKS: 17
+		PID: 3, TICKS: 0
+
+		The given count of procedures is: 2, 2 children will be created to exec testproc with given amount of tickets
+		The parent pid is: 3
+
+		2 children will now be created
+
+		At tick count: 46
+		PID: 1, TICKS: 15
+		PID: 2, TICKS: 18
+		PID: 3, TICKS: 13
+		PID: 4, TICKS: 0
+		Child number: 1 created. PID: 4
+
+		At tick count: 50
+		PID: 1, TICKS: 15
+		PID: 2, TICKS: 18
+		PID: 3, TICKS: 16
+		PID: 4, TICKS: 1
+		PID: 5, TICKS: 0
+		Child number: 2 created. PID: 5
+
+		At tick count: 823
+		PID: 1, TICKS: 15
+		PID: 2, TICKS: 18
+		PID: 3, TICKS: 19
+		PID: 4, TICKS: 267
+		PID: 5, TICKS: 504
+		PID: 5 started at ticks 50, ended at ticks 823, used 505 of those ticks, and had a ticket priority of 10
+
+		At tick count: 1069
+		PID: 1, TICKS: 15
+		PID: 2, TICKS: 18
+		PID: 3, TICKS: 20
+		PID: 4, TICKS: 511
+		PID: 4 started at ticks 46, ended at ticks 1069, used 512 of those ticks, and had a ticket priority of 5
+
+		At tick count: 1071
+		PID: 1, TICKS: 15
+		PID: 2, TICKS: 18
+		PID: 3, TICKS: 21
+		PID: 3 started at ticks 32, ended at ticks 1071, used 22 of those ticks, and had a ticket priority of 1
+
+The attached report.pdf shows a table and charts describing the results of running
+	multifork 2 10 100
+
+The graphs show the parent process and the two children and how they were prioritized by the scheduler
+
+***Steps so far for project 2***
+
+	KERNAL CODE
+	
+	1. created pstat.h
+	
+	2. created a struct in proc.c that contains a pstat variable and a lock for the variable
+	
+	3. created a struct in proc.c for tracking ticks - amountof time scheduler has been run for each process, when it started and ended, with a lock
+	
+	4. defined high, low, and 'high/low' queues, with locks
+	
+	5. created node.c, node.h - definitions for queues and functions to help use them
+	
+	6. created initializing functions for all locks to be run in main.c
+	
+	7. created system calls and defined/set them up in all releveant files (usys.S, syscall.h etc.)
+	
+	8. made some helper functions for printing queue, ticket, process information, finding lottery winner, getting a random number...
+	
+	9. in the allocproc function, after a process is successfulyy allocated (a spot is available in the ptable and it is assigned to it) a spot in the pstat 
+	table is found and allocated
+	
+	10. a spot in the ticktracker struct is allocated for tracking when a process begins, when it ends
+	
+	11. in the fork() function, when a project creates a child, after the child is created, the child's tickets get set to the same amount as the parents tickets
+	
+	12. when exit() is called by a process the end value is set in the ticktracker object
+	
+	13. in the wait() function, if a process is found to have a child in zombie state it is deleted. when this deletion happens the process is removed from the pstat variable, whichever queue it is currently in, and from the ticktracker object
+	
+	14. scheduler - a lottery is held for the High low queue, if it cannot find an availbe winner, a lottery is held for the high queue, if a winner is not available, a lottery is held for the low queue.
+	
+	15. when a winner is found, it's corresponding ticks value (high or low) is incremented and it is moved to a different queue (processes in the high queue are moved to the low queue after running, low queue to high low queue, high low queue to low queue)
+	
+	16. the find winner function works by taking a queue, holding a lottery based on tickets in the queue. if the queue is empty it will signal failure(-1). if a winner is selected, but it is unrunnable, the winner will be temporarily removed from the queue and the lottery will run again, if no items are runnable the queue will eventually be found to be empty and failure will be signalled.
+	
+	17. The random number generation uses the Park Miller method. I found the method online at https://www.cs.virginia.edu/~cr4bd/4414/F2018/lottery.html
+	
+	18. I cast the unsigned random number generated to an int, then use random % (max + 1) to assigen to a number between 0 and max
+
+	USER PROGRAMS
+
+		multifork
+			Takes a list of integers - numprocesses tickets[proc 1]...tickets[proc n]
+			This program creates n children, and assigns a ticket value for it's children
+			This was doen instead of having the children assign their own tickets to help reduce how much time a child used to assign their ticket value before running, and how that would affect the outcome of how the child was scheduled
+			Each child execute testproc
+			The parent waits for each child to finish and then exits
+
+		testproc
+			simply yields the cpu 500 times and then exits
+
+***Acknowledgments***
+
+xv6, its creators owners etc.
+
+Park/Miller - the creators of the algorithm I used for psqeudorandom number generation, and Charles Reiss at the University of Virginia CS department for his implementation of the alogrithm in C found at https://www.cs.virginia.edu/~cr4bd/4414/F2018/files/lcg_parkmiller_c.txt
+
+The book used for this class, Operating Systems: Three Easy Pieces was referenced heavily as I learned how to write system calls.
+
+Bibliography for book:
+	Operating Systems: Three Easy Pieces
+		Remzi H. Arpaci-Dusseau and Andrea C. Arpaci-Dusseau
+		Arpaci-Dusseau Books
+		August, 2018 (Version 1.00)
+
+Website for Book:
+	http://pages.cs.wisc.edu/~remzi/OSTEP/ 

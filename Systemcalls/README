@@ -1,0 +1,166 @@
+
+***This project was done using xv6, the following is parts of their README with all acknowledgements made by creators of xv6***
+
+xv6 is a re-implementation of Dennis Ritchie's and Ken Thompson's Unix
+Version 6 (v6).  xv6 loosely follows the structure and style of v6,
+but is implemented for a modern x86-based multiprocessor using ANSI C.
+
+ACKNOWLEDGMENTS
+
+xv6 is inspired by John Lions's Commentary on UNIX 6th Edition (Peer
+to Peer Communications; ISBN: 1-57398-013-7; 1st edition (June 14,
+2000)). See also https://pdos.csail.mit.edu/6.828/, which
+provides pointers to on-line resources for v6.
+
+xv6 borrows code from the following sources:
+    JOS (asm.h, elf.h, mmu.h, bootasm.S, ide.c, console.c, and others)
+    Plan 9 (entryother.S, mp.h, mp.c, lapic.c)
+    FreeBSD (ioapic.c)
+    NetBSD (console.c)
+
+The following people have made contributions: Russ Cox (context switching,
+locking), Cliff Frey (MP), Xiao Yu (MP), Nickolai Zeldovich, and Austin
+Clements.
+
+We are also grateful for the bug reports and patches contributed by Silas
+Boyd-Wickizer, Anton Burtsev, Cody Cutler, Mike CAT, Tej Chajed, eyalz800,
+Nelson Elhage, Saar Ettinger, Alice Ferrazzi, Nathaniel Filardo, Peter
+Froehlich, Yakir Goaron,Shivam Handa, Bryan Henry, Jim Huang, Alexander
+Kapshuk, Anders Kaseorg, kehao95, Wolfgang Keller, Eddie Kohler, Austin
+Liew, Imbar Marinescu, Yandong Mao, Matan Shabtay, Hitoshi Mitake, Carmi
+Merimovich, Mark Morrissey, mtasm, Joel Nider, Greg Price, Ayan Shafqat,
+Eldar Sehayek, Yongming Shen, Cam Tenny, tyfkda, Rafael Ubal, Warren
+Toomey, Stephen Tu, Pablo Ventura, Xi Wang, Keiichi Watanabe, Nicolas
+Wolovick, wxdao, Grant Wu, Jindong Zhang, Icenowy Zheng, and Zou Chang Wei.
+
+The code in the files that constitute xv6 is
+Copyright 2006-2018 Frans Kaashoek, Robert Morris, and Russ Cox.
+
+***Further Acknowledgements***
+
+The book used for this class, Operating Systems: Three Easy Pieces was referenced heavily as I learned how to write system calls.
+
+Bibliography for book:
+	Operating Systems: Three Easy Pieces
+		Remzi H. Arpaci-Dusseau and Andrea C. Arpaci-Dusseau
+		Arpaci-Dusseau Books
+		August, 2018 (Version 1.00)
+
+Website for Book:
+	http://pages.cs.wisc.edu/~remzi/OSTEP/
+
+I also learned a lot about how to go about completing this project by watching the book author - Remzi Arpaci-Dusseau's - uploaded video discussion on xv6 system calls, found on youtube at: https://www.youtube.com/watch?v=vR6z2QGcoo8
+
+And finally I referenced notes made during my own class lecture at Metrostate University [https://www.metrostate.edu/] in the class ICS 462 for which this project is being completed, with instruction being given by Mathew Nyamagwa
+
+***Creating the custom System Calls for this project***
+
+The goal of this project is to create a custom system call in xv6.
+For this project I have created two custom system calls
+
+	- int getsyscallinfo(int *n)
+	- int getallsyscalls(int *n)
+	- int getsyscallinfostruct(struct syscallinfostruct *s)
+
+getsyscallinfo counts how many times that particular system call (itself) has been called. it increments the counter before the procedure is run, thus returning 1 the first time it is called, 2 the second, and so on.
+
+getallsyscalls is counter that keeps track of how many times ANY system calls have been called, incrementing the counter before calling any sytem call in the same manner as getsyscallinfo
+
+the struct syscallinfostruct is a fairly simple struct, it has two member variables int counts[] and char *names[]. counts is used to track the number of times each system call has been made and names is used to contain the corresponding name of the system call, e.x. counts[1] would contain how many times fork has been called, and names[1] would contain "fork"
+
+the kernel has an int[] variable (located in the file syscall.c) used to count how many times each system call has been made, and calling getsyscallinfostruct sets the passed struct's count variable to the values of the kernel level counts being tracked
+
+These system calls were created by:
+
+	1. adding definitions to the header file user.h
+	
+	2. adding them to the list of systemcalls to be invoked with SYSCAll(name) in usys.S
+	
+	3. defining system call numbers in the header file syscall.h
+	
+	4. adding the externally defined functions in syscall.c
+	
+	5. adding them to the array of syscalls with the system call number from syscall.h as the index and the function as the value
+	
+	6. Defining the functions used to set pointers in syscall.c in defs.h
+	
+	7. defining the struct used to count each system call and the names of the function in a new file called systemcallinfo.h, as well as writing a function used to initialize the function names into the names variable (to be used by the testing program). THis function was supposed to be implemented in syscallinfostruct.c, but due to some trouble with linking the object file and figuring out how to work with these new things I ended up defining the initialzing function in the testing program syscalltest.c so that it could be properly used. **to be fixed in the future**
+	
+	8. I created global variables in the syscall.c file int syscallcount,  int totalsystemcalls, and int[] counts
+	
+	9. in the syscall function, after number pulled from the eax register is found to be valid, it checks if system call number is for getsyscallinfo, and if so increments the syscallcount integer
+	
+	10. for any valid system call number, the totalsystemcalls integer is incremented
+	
+	11. counts[num] is also incremented to count how many times each particular system call is made
+	
+	12. defining functions in syscall.c that will set the values of given pointers to the requested information
+	
+	13. writing the sys calls in sysproc.c that fetch the pointers given by the user using argptr, and if they are valid pointers calls functions defined in syscall.c that have access to the variables being used to count
+
+I created a user program to test these system calls. After starting the xv6 with make qemu or make qemu-nox, the test can be performed by simply typing syscalltest in the shell prompt.
+
+Here is an example output of the test being run:
+
+	$ syscalltest
+
+	The custom system call getsyscallinfo() has been called: 1 time(s).
+
+	There have been: 50 system calls of any type.
+
+	Name                 System Call Number   Count
+	fork                 1                    2
+	exit                 2                    0
+	wait                 3                    2
+	pipe                 4                    0
+	read                 5                    12
+	kill                 6                    0
+	exec                 7                    3
+	fstat                8                    0
+	chdir                9                    0
+	dup                  10                   2
+	getpid               11                   0
+	sbrk                 12                   2
+	sleep                13                   0
+	uptime               14                   0
+	open                 15                   3
+	write                16                   20
+	mknod                17                   1
+	unlink               18                   0
+	link                 19                   0
+	mkdir                20                   0
+	close                21                   1
+	getsyscallinfo       22                   1
+	ruct                 23                   1
+	getsyscallinfostruct 24                   1
+
+
+This test program was created by:
+	1. writing a simple c file that prints the result of making each system call
+	2. writing a function to be used to indent strings by printing a given number of a given char before printing the string
+	3. adding the function for intitializing the syscallinfostruct that waas supposed to be defined in syscallinfostruct.c (***to be fixed***)
+	4. adding the program to the list of user programs in the makefile
+
+***Problems with this project***
+	There could be a possible miscount for system calls due to multiple processes trying to edit the same counters. This could be fixed by implementing a lock on the counters so only one process has access to it at a time (this might also slow down system calls A LOT due to them not being able to complete their call until they aquire the lock)
+
+	right now the number of system calls and the corresponding names are hardcoded in the initializing function in syscallinfostruct.h. this is might be able to be done dynamically by using the variable int (*syscalls[])(void) located in syscalls.c. the sizeof this array could be used to define how many system calls there are (assuming any system calls follows the pattern of being define 1,2,3 ... n) and no numbers are skipped etc. I am not sure if it is possible to get the name of a function from a funciton pointer, but if possible the corresponding value could be used to set the names variable.
+
+	The init function for the syscallinfostruct is working properly, but I can't seem to figure out how to include my own .c file that isnt a user program properly in the xv6 Makefile. More research/work is needed. Temporary workaround is to include the function in the user program .c file used to test the system calls.
+
+***Possible Further Work***
+	1. fixing the concurrency problem
+	2. learning more about function pointers
+	3. improving the printing done in the syscalltest.c file, I'd like to make a function that takes a count of columns, an array of headers, and an array for each column values, printing everything out perfectly. would likely be useful in future project. could possible be defined: 
+
+		void columnprinters(int filedirectory, int numcols, char *colheaders[], ...)
+
+	Would have to learn how to use variable argument counts in functions. look at printf function definition for hints on how to use it?
+	Would also have to check that I am given the correct amount of args first before printing?
+
+	4. fix the inclusion of syscallinfostruct.c
+
+***Myself***
+All work done for this project has been done solely by myself - Joseph Jackels - with help, information, research etc. from any and all acknowledged sources stated above
+This work has been done as part of a project for an Operating Systems course at Metrostate University
+Last Updated: 2/3/2021 
