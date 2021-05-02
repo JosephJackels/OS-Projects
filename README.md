@@ -16,7 +16,7 @@ A link to their version of xv6 can be found [here](https://github.com/mit-pdos/x
 As directed in the course, these projects were built to be assumed to be run on a linux machine or virtual machine with an x86_64 cpu.
 The machine must have qemu, gcc, and qemu-system-x86 installed. Adjustments can be made to run these projects on other machines by adjusting the makefile, view the xv6 repo linked above for more information.
 
-Sample output will be shown for each project in the appropriate directory, the projects can be fully tested in a linux machine or virtual machine by downloading the project, traversing to the approriate xv6-public directory, running the make command, and finally running make qemu (for a gui version) or make qemu-nox (to run in the current terminal). Each project directory contains a README file to describe proper usage and testing of the code I have implemented.
+Sample output will be shown for each project in the appropriate directory, the projects can be fully tested in a linux machine or virtual machine by downloading the project, traversing to the approriate xv6-private directory, running the make command, and finally running make qemu (for a gui version) or make qemu-nox (to run in the current terminal). Each project directory contains a README file to describe proper usage and testing of the code I have implemented.
 
 ## Skills learned while completing these projects
 
