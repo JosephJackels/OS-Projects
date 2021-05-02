@@ -131,7 +131,7 @@ Here is an example output of the test being run:
 	mkdir                20                   0
 	close                21                   1
 	getsyscallinfo       22                   1
-	ruct                 23                   1
+	getallsyscalls       23                   1
 	getsyscallinfostruct 24                   1
 
 
