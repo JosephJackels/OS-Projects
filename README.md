@@ -6,9 +6,9 @@ This repository is a collection of projects completed for the course ICS462 Oper
 
 It consists of three projects:
 
-1. Intro to xv6 (Systemcalls)
-2. Lottery Scheduling (Scheduling)
-3. Null Pointers (VirtualMemory)
+1. Introduction to xv6 (Systemcalls)
+2. xv6 Scheduler (Scheduling)
+3. The Null Pointer and Other Tricks (VirtualMemory)
 
 All three projects were built for/using the xv6 OS implemented by the Parallel and Distributed Operating Systems group at MIT CSAIL.
 A link to their version of xv6 can be found [here](https://github.com/mit-pdos/xv6-public).
@@ -30,7 +30,7 @@ Sample output will be shown for each project in the appropriate directory, the p
 
 ## Basic Project Descriptions
 
-### Project 1 - Intro to xv6
+### Project 1 - Introduction to xv6
 
 The goal given by this project was to implement a custom system call in the xv6 Operating System that would return how many times this custom has been called (incrementing the count before returning a value).
 
