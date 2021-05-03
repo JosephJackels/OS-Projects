@@ -6,9 +6,9 @@ This repository is a collection of projects completed for the course ICS462 Oper
 
 It consists of three projects:
 
-1. Introduction to xv6 (Systemcalls)
-2. xv6 Scheduler (Scheduling)
-3. The Null Pointer and Other Tricks (VirtualMemory)
+1. Introduction to xv6 ([Systemcalls](Systemcalls/))
+2. xv6 Scheduler ([Scheduling](Scheduling/))
+3. The Null Pointer and Other Tricks ([VirtualMemory](VirtualMemory/))
 
 All three projects were built for/using the xv6 OS implemented by the Parallel and Distributed Operating Systems group at MIT CSAIL.
 A link to their version of xv6 can be found [here](https://github.com/mit-pdos/xv6-public).
