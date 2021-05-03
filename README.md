@@ -44,6 +44,8 @@ To complete this project I:
 	* Including a very simple but cool function for indenting strings of different lengths so that each column would line up properly
 		* (needs some work to be polished into a version that can be easily reused for future projects
 
+##### Example Output
+
 ![Example Output - system call creation](Systemcalls/ExOutput.png)
 
 ### Project 2 - xv6 Scheduler
@@ -63,6 +65,8 @@ To complete this project I:
 * Created a user program that takes in an amount of children to create, followed by a ticket weight to be given for each child
 	* ex multifork 3 1 5 10 would create 3 children with 1, 5 and 10 tickets beign given as a weight for each.
 
+##### Example Output
+
 ![Example Output - scheduler timing](Scheduling/ExOutput.png)
 
 ### Project 3 - The Null Pointer and Other Tricks
@@ -76,6 +80,8 @@ This part of the project was completed by:
 * Editing the kernal so userprograms would execute properly and page tables would be built and copied correctly
 * Editing system calls used for fetching variables to include a check that ensures a the programs address apce is not being viloated in either direction - otherwise generating the desired null pointer exception
 
+##### Example Output
+
 ![Example Output - null pointer exception](VirtualMemory/ExOutputNullPointer.png)
 
 #### Part 2 - Stack relocation
@@ -86,6 +92,8 @@ This part of the project was completed by:
 * Invalidating the page below the stack so there is a 'barrier' between the stack and the heap
 * adding a trap for when a page fault is triggered so that a new page is allocated, moving the stack down one page
 * fixxing previous changes made so that null pointer exceptions would continue to be generated and address space would be verified properly.
+
+##### Example Output
 
 ![Example Output - stack relocation](VirtualMemory/ExOutputStackRelocate.png)
 
