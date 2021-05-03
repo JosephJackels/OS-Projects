@@ -69,6 +69,8 @@ To complete this project I:
 
 ![Example Output - scheduler timing](Scheduling/ExOutput.png)
 
+View the [report pdf](Scheduling/report.pdf) for graphs and tables showing how this scheduling perfmormed compared to how it was expected to.
+
 ### Project 3 - The Null Pointer and Other Tricks
 
 The aim of this project is to cause the OS to generate and exception when a program tries to dereference a null pointer, and to rearrange a processes address space so that the stack is on the high end growing downwards.
