@@ -48,6 +48,8 @@ To complete this project I:
 
 ![Example Output - system call creation](Systemcalls/ExOutput.png)
 
+This image show the output of running my user program syscalltest, which shows how many times the getsyscallinfo system call has been made, how many system calls in general have been made, and a table showing the 21 built in system calls plus my 3 custom system calls, their system call number, and a count of how many times each system call has been made.
+
 ### Project 2 - xv6 Scheduler
 
 This project updates the scheduler being used in the xv6 OS from using a basic round robin scheduler to one that uses a combination of a multi-level feedback queue and lottery scheduling.
@@ -71,6 +73,8 @@ To complete this project I:
 
 View the [report pdf](Scheduling/report.pdf) for graphs and tables showing how this scheduling perfmormed compared to how it was expected to.
 
+This image shows how everytime a process is created the system will print out a list of each process currently running and how many times each process has been chosen by the scheduler. It also shows how everytime a process ends and is removed from the process table (and any other tables I have made) a print is made to show when that process started, when it ended, and its ticket count (priority level).
+
 ### Project 3 - The Null Pointer and Other Tricks
 
 The aim of this project is to cause the OS to generate and exception when a program tries to dereference a null pointer, and to rearrange a processes address space so that the stack is on the high end growing downwards.
@@ -86,6 +90,8 @@ This part of the project was completed by:
 
 ![Example Output - null pointer exception](VirtualMemory/ExOutputNullPointer.png)
 
+This image simply shows a succesful dereference of a location that is within address space - 4096 or 0x1000, followed by the result of attempting a dereference of a location outside of address space - 4095 or 0x0FFF.
+
 #### Part 2 - Stack relocation
 
 This part of the project was completed by:
@@ -98,4 +104,6 @@ This part of the project was completed by:
 ##### Example Output
 
 ![Example Output - stack relocation](VirtualMemory/ExOutputStackRelocate.png)
+
+This image shows the output of a user program that simply creates a large amount of variables, eventually triggering a page fault and causing the kernal to allocate another page for the stack, moving the stack address down one page from 0x7FFFE000 to 0x7FFFD000.
 
